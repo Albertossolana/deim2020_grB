@@ -1,96 +1,119 @@
-﻿using System.Collections;
+﻿using System;
+using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.UI; //Importante importar esta librería para usar la UI
 
 public class SpaceshipMove : MonoBehaviour
 {
-    //--SCRIPT PARA MOVER LA NAVE --//
+    
 
     //Variable PÚBLICA que indica la velocidad a la que se desplaza
     //La nave NO se mueve, son los obtstáculos los que se desplazan
     public float speed;
 
-
-    //Variable que determina cómo de rápido se mueve la nave con el joystick
-    //De momento fija, ya veremos si aumenta con la velocidad o con powerUps
-    private float moveSpeed = 3f;
+    private bool RangoMovX = true;
+    private bool RangoMovY = true;
+    
+    public float moveSpeed = 3f;
     //Variable que determina si estoy en los márgenes
-    private bool inMarginMoveX = true;
-    private bool inMarginMoveY = true;
+   
 
     //Capturo el texto del UI que indicará la distancia recorrida
     [SerializeField] Text TextDistance;
+    [SerializeField] Text TextSpeed;
 
-    //Variables para rotacion
-    Vector3 currentEulerAngles;
-    float x;
-    float y;
-    float z;
-
-    //AudioSource
+     //AudioSource
     private AudioSource audioSource;
-
 
     // Start is called before the first frame update
     void Start()
     {
-        speed = 5f;
+        audioSource = GetComponent<AudioSource>();
+        //speed = 1f;
         //Llamo a la corrutina que hace aumentar la velocidad
         StartCoroutine("Distancia");
-
-        //Asocio el componente de audio
-        audioSource = GetComponent<AudioSource>();
-
-
+       TextShowFinalDistance.text = " ";
+       TextPlayAgain.text = " "; 
     }
-
-
 
     // Update is called once per frame
     void Update()
     {
         //Ejecutamos la función propia que permite mover la nave con el joystick
         MoverNave();
-
-        //Disparo el sonido
-        if(Input.GetKeyDown("space"))
+         if(Input.GetKeyDown("space"))
         {
             audioSource.Play();
         }
-
     }
+     [SerializeField] MeshRenderer VisionNave;
 
-
-
+    [SerializeField] Text TextPlayAgain;
+    [SerializeField] Text TextShowFinalDistance;
+   
+   
+    private int n;
+//Colision de la nave y consecuencias
+ private void OnTriggerEnter(Collider other)
+    {
+        
+        if (other.gameObject.tag == "obstacle")
+        { 
+        //print("Ha colisionado");
+        
+        StopCoroutine("Distancia");
+        VisionNave.enabled = false;
+        speed = 0f;
+        TextShowFinalDistance.text = "DISTANCIA" + n;
+        TextPlayAgain.text = "Play again";
+        }
+     
+    }
+     
     //Corrutina que hace cambiar el texto de distancia
     IEnumerator Distancia()
     {
+        
         //Bucle infinito que suma 10 en cada ciclo
         //El segundo parámetro está vacío, por eso es infinito
         for(int n = 0; ; n++)
         {
             //Cambio el texto que aparece en pantalla
-            TextDistance.text = "DISTANCIA: " + n * speed;
-
-            //Cada ciclo aumenta la velocidad
-            if(speed < 30)
-            {
-                speed = speed + 0.1f;
-            }
+            TextDistance.text = "DISTANCIA: " + n*speed;
+            TextSpeed.text = "VELOCIDAD: " + speed;
+            //Aumento de la velocidad segun el tiempo
+        if (speed <= 40f)
+        {
+              speed = speed + 0.5f;
+        }
             
-            //Ejecuto cada ciclo esperando 1 segundo
-            yield return new WaitForSeconds(0.25f);
+         //Aumento de la velocidad según ciertas distancias
+           /*if ( n <20)
+            {
+                speed = 5;
+            }
+           else if (n >= 20 && n < 100)
+            {
+                speed = 10;
+            }
+           else if (n >= 100 && n< 500)
+            {
+                speed = 15;
+            }
+           else 
+            {
+                speed = 20;
+            }
+          */
+            //Ejecuto cada ciclo esperando medio segundo
+            yield return new WaitForSeconds(0.5f);    
         }
         
     }
-
-
-
+   
     void MoverNave()
     {
-        
-        
         /*
         //Ejemplos de Input que podemos usar más adelante
         if(Input.GetKey(KeyCode.Space))
@@ -109,76 +132,58 @@ public class SpaceshipMove : MonoBehaviour
 
         //Movemos la nave mediante el método transform.translate
         //Lo multiplicamos por deltaTime, el eje y la velocidad de movimiento la nave
+        float MyPosX = transform.position.x;
+        float MyPosY = transform.position.y;
 
-        //print(transform.position.x);
-        float myPosX = transform.position.x;
-        float myPosY = transform.position.y;
-
-        //Lanzamos el método que nos comprueba la restricción en X y en Y
-        checkRestrX(myPosX, desplX);
-        checkRestrY(myPosY, desplY);
-
-        //Si estoy en los márgenes, me muevo
-        if (inMarginMoveX)
+        //print("DesplX: " + desplX + " - MyposX" + MyPosX);
+     
+        if(MyPosX < -6 && desplX < 0)
         {
-            transform.Translate(Vector3.right * Time.deltaTime * moveSpeed * desplX);
-
-            //Roto
-            float rotZ = desplX * Time.deltaTime * moveSpeed ;
-            float rotX = desplY * Time.deltaTime * moveSpeed;
-
-            //transform.Rotate(rotX * 10, 0, rotZ * -10);
-
-            //modifying the Vector3, based on input multiplied by speed and time
-            currentEulerAngles += new Vector3(rotX * -5000, y, rotZ * -10000) * Time.deltaTime;
-
-            //apply the change to the gameObject
-            transform.eulerAngles = currentEulerAngles;
+            RangoMovX = false;
         }
-        if(inMarginMoveY)
+        else if(MyPosX < -6 && desplX > 0)
         {
-            transform.Translate(Vector3.up * Time.deltaTime * moveSpeed * desplY);
+            RangoMovX = true;
         }
-
-    }
-
-    void checkRestrX(float myPosX, float desplX)
-    {
-       //He usado una booleana para reducir el nº de IFs
-       //Usando || podemos poner una condición OR otra
-        if (myPosX < -4.5 && desplX < 0 || myPosX > 4.5 && desplX > 0)
+        else if(MyPosX > 5.6 && desplX > 0)
         {
-            inMarginMoveX = false;
+            RangoMovX = false;
         }
-        else if (myPosX < -4.5 && desplX > 0 || myPosX > 4.5 && desplX < 0)
+        else if(MyPosX > 5.6 && desplX < 0)
         {
-            inMarginMoveX = true;
+            RangoMovX = true;
+        }
+      
+
+        if (MyPosY < 0 && desplY < 0)
+        {
+            RangoMovY = false;
+        }
+        else if (MyPosY < 0 && desplY > 0)
+        {
+            RangoMovY = true;
+        }
+        else if (MyPosY > 4.8 && desplY > 0)
+        {
+            RangoMovY = false;
+        }
+        else if (MyPosY > 4.8 && desplY < 0)
+        {
+            RangoMovY = true;
         }
 
-    }
 
+        if (RangoMovX)
+            {
+            transform.Translate(Vector3.right * Time.deltaTime * moveSpeed* speed/10f * desplX);
+        }
+        if (RangoMovY)
+        {
+            transform.Translate(Vector3.up * Time.deltaTime * moveSpeed* speed/10f * desplY);
+        }
 
-    void checkRestrY(float myPosY, float desplY)
-    {
-        //Retricción en Y
-        if (myPosY < -0 && desplY < 0 || myPosY > 4 && desplY > 0)
-        {
-            inMarginMoveY = false;
-        }
-        else if (myPosY < -0 && desplY > 0 || myPosY > 4 && desplY < 0)
-        {
-            inMarginMoveY = true;
-        }
-    }
+            
 
-    private void OnTriggerEnter(Collider other)
-    {
-        if(other.gameObject.tag == "obstacle")
-        {
-            print("Chocado");
-            Destroy(gameObject);
-            speed = 0;
-        }
         
     }
 }

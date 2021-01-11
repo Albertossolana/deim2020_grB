@@ -9,18 +9,16 @@ public class ObstacleMove : MonoBehaviour
     //Este valor deberá depender de la velocidad de la nave
     private float obstacleSpeed;
 
-    //Variables necesarias para acceder al script asociado a la nave
     public GameObject SpaceShip;
-    //Cramos una variable de tipo clase pública "SpaceshipMove"
     SpaceshipMove spaceshipMove;
-
+    
     // Start is called before the first frame update
     void Start()
     {
-        //Como desde el prefab no podemos arrastrar el GameObject, lo buscamos en la escena
+        //Buscamos el GameObjet y damos el componente de la nave a la variable
         SpaceShip = GameObject.Find("Spaceship");
-        //Asociamos a la variable el componente de la nave (es decir su script)
         spaceshipMove = SpaceShip.GetComponent<SpaceshipMove>();
+        
     }
 
     // Update is called once per frame
@@ -35,7 +33,8 @@ public class ObstacleMove : MonoBehaviour
             Destroy(gameObject);
         }
 
-        //Asignamos la velocidad que nos da el script de la nave (spaceshipMove)
+       
+        //La velocidad de los obstaculos es la velocidad que tiene la nave
         obstacleSpeed = spaceshipMove.speed;
         transform.Translate(Vector3.back * Time.deltaTime * obstacleSpeed);
  
