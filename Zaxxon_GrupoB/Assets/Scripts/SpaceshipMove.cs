@@ -22,9 +22,19 @@ public class SpaceshipMove : MonoBehaviour
     //Capturo el texto del UI que indicará la distancia recorrida
     [SerializeField] Text TextDistance;
     [SerializeField] Text TextSpeed;
-
-     //AudioSource
+    [SerializeField] Text TextShowFinalDistance;
+    //AudioSource
     private AudioSource audioSource;
+  
+    [SerializeField] MeshRenderer VisionNave;
+    [SerializeField] GameObject CanvasFinalJuego;
+
+     Vector3 rotacion;
+     float rotZ;
+     float rotX;
+    float x;
+    float y;
+    float z;
 
     // Start is called before the first frame update
     void Start()
@@ -34,7 +44,8 @@ public class SpaceshipMove : MonoBehaviour
         //Llamo a la corrutina que hace aumentar la velocidad
         StartCoroutine("Distancia");
        TextShowFinalDistance.text = " ";
-       TextPlayAgain.text = " "; 
+        CanvasFinalJuego.SetActive(false);
+       
     }
 
     // Update is called once per frame
@@ -47,13 +58,10 @@ public class SpaceshipMove : MonoBehaviour
             audioSource.Play();
         }
     }
-     [SerializeField] MeshRenderer VisionNave;
-
-    [SerializeField] Text TextPlayAgain;
-    [SerializeField] Text TextShowFinalDistance;
+    
    
    
-    private int n;
+    
 //Colision de la nave y consecuencias
  private void OnTriggerEnter(Collider other)
     {
@@ -65,10 +73,10 @@ public class SpaceshipMove : MonoBehaviour
         StopCoroutine("Distancia");
         VisionNave.enabled = false;
         speed = 0f;
-        TextShowFinalDistance.text = "DISTANCIA" + n;
-        TextPlayAgain.text = "Play again";
+        TextShowFinalDistance.text = TextDistance.text;
+        CanvasFinalJuego.SetActive(true);
+
         }
-     
     }
      
     //Corrutina que hace cambiar el texto de distancia
@@ -176,6 +184,13 @@ public class SpaceshipMove : MonoBehaviour
         if (RangoMovX)
             {
             transform.Translate(Vector3.right * Time.deltaTime * moveSpeed* speed/10f * desplX);
+           
+             //rotZ = desplX * Time.deltaTime * moveSpeed;
+             //rotX = desplY * Time.deltaTime * moveSpeed;
+            
+
+            //rotacion += new Vector3 (rotX * -5000, y, rotZ * -10000) * Time.deltaTime;
+            //transform.eulerAngles = rotacion;
         }
         if (RangoMovY)
         {
