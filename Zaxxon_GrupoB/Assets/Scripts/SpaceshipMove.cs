@@ -29,9 +29,7 @@ public class SpaceshipMove : MonoBehaviour
     [SerializeField] MeshRenderer VisionNave;
     [SerializeField] GameObject CanvasFinalJuego;
 
-     Vector3 rotacion;
-     float rotZ;
-     float rotX;
+    
     float x;
     float y;
     float z;
@@ -182,22 +180,20 @@ public class SpaceshipMove : MonoBehaviour
 
 
         if (RangoMovX)
-            {
-            transform.Translate(Vector3.right * Time.deltaTime * moveSpeed* speed/10f * desplX);
-           
-             //rotZ = desplX * Time.deltaTime * moveSpeed;
-             //rotX = desplY * Time.deltaTime * moveSpeed;
+        {
+            transform.Translate(Vector3.right * Time.deltaTime * moveSpeed * desplX, Space.World);
             
 
-            //rotacion += new Vector3 (rotX * -5000, y, rotZ * -10000) * Time.deltaTime;
+            //rotacion += new Vector3 (rotX * -5000, y, rotZ * -10000) * me;
             //transform.eulerAngles = rotacion;
         }
         if (RangoMovY)
         {
-            transform.Translate(Vector3.up * Time.deltaTime * moveSpeed* speed/10f * desplY);
+            transform.Translate(Vector3.up * Time.deltaTime * moveSpeed * desplY, Space.World);
+        
         }
 
-            
+            transform.rotation = Quaternion.Euler(0,0, desplX * -50);
 
         
     }
