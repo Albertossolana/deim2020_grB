@@ -193,7 +193,7 @@ public class SpaceshipMove : MonoBehaviour
         
         }
 
-            transform.rotation = Quaternion.Euler(0,0, desplX * -50);
+            transform.rotation = Quaternion.Euler(0,0, desplX * -20);
 
         
     }

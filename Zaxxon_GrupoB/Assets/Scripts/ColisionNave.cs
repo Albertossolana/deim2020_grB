@@ -28,6 +28,7 @@ public class ColisionNave : MonoBehaviour
          
         VisionNave.enabled = false;
         spaceshipMove.speed = 0f;
+        
         //TextShowFinalDistance.text = "Distancia" + n;
         TextPlayAgain.text = "PLAY AGAIN";
         }

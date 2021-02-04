@@ -2,10 +2,16 @@
 using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.SceneManagement;
+using UnityEngine.UI;
 
 public class InteractividadBotones : MonoBehaviour
 {
-   public void EmpezarJuego()
+    /*public Button BotonInicio;
+    void Start()
+    {
+        BotonInicio.Select();
+    }*/
+    public void EmpezarJuego()
     {
         SceneManager.LoadScene("EscenaJuego");
     }
