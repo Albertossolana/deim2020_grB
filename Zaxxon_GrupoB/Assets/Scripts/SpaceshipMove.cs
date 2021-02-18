@@ -28,11 +28,8 @@ public class SpaceshipMove : MonoBehaviour
   
     [SerializeField] MeshRenderer VisionNave;
     [SerializeField] GameObject CanvasFinalJuego;
-
-    
-    float x;
-    float y;
-    float z;
+    [SerializeField] GameObject explosion;
+    [SerializeField] AudioClip explosionSound;
 
     // Start is called before the first frame update
     void Start()
@@ -43,7 +40,7 @@ public class SpaceshipMove : MonoBehaviour
         StartCoroutine("Distancia");
        TextShowFinalDistance.text = " ";
         CanvasFinalJuego.SetActive(false);
-       
+        audioSource.Play();
     }
 
     // Update is called once per frame
@@ -51,10 +48,9 @@ public class SpaceshipMove : MonoBehaviour
     {
         //Ejecutamos la función propia que permite mover la nave con el joystick
         MoverNave();
-         if(Input.GetKeyDown("space"))
-        {
-            audioSource.Play();
-        }
+        
+            
+        
     }
     
    
@@ -70,12 +66,23 @@ public class SpaceshipMove : MonoBehaviour
         
         StopCoroutine("Distancia");
         VisionNave.enabled = false;
+        Instantiate(explosion, transform);
+        moveSpeed = 0f;
+        transform.rotation = Quaternion.Euler(0, 0, 0);
+            
         speed = 0f;
-        TextShowFinalDistance.text = TextDistance.text;
-        CanvasFinalJuego.SetActive(true);
-
+        audioSource.Stop();
+        audioSource.PlayOneShot(explosionSound);
+        Invoke("GameOver", 2.0f);
+            moveSpeed = 0f;
+            transform.rotation = Quaternion.Euler(0, 0, 0);
         }
     }
+private void GameOver()
+   {
+        TextShowFinalDistance.text = TextDistance.text;
+        CanvasFinalJuego.SetActive(true);
+   }
      
     //Corrutina que hace cambiar el texto de distancia
     IEnumerator Distancia()
